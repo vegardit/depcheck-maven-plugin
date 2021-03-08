@@ -119,7 +119,7 @@
       <dependency>
          <groupId>net.sf.jstuff</groupId>
          <artifactId>jstuff-xml</artifactId>
-         <version>5.14.0</version>
+         <version>5.14.2</version>
       </dependency>
 
       <dependency>
