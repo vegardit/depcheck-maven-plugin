@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+   <!--
+   Copyright 2013-2021 by Vegard IT GmbH, Germany, https://vegardit.com
+   SPDX-License-Identifier: Apache-2.0
+   -->
+
+   <modelVersion>4.0.0</modelVersion>
+
+   <parent>
+      <groupId>com.vegardit.maven</groupId>
+      <artifactId>vegardit-maven-parent</artifactId>
+      <version>RELEASE</version>
+   </parent>
+
+   <groupId>com.vegardit.maven</groupId>
+   <artifactId>depcheck-maven-plugin</artifactId>
+   <version>1.0.1-SNAPSHOT</version>
+   <packaging>maven-plugin</packaging>
+
+
+   <name>${project.artifactId}</name>
+   <description>Pragmatic Maven plugin to check for unused direct and used indirect (transitive) dependencies.</description>
+   <url>https://github.com/vegardit/depcheck-maven-plugin</url>
+   <inceptionYear>2013</inceptionYear>
+   <organization>
+      <name>Vegard IT GmbH, Germany</name>
+      <url>https://vegardit.com/</url>
+   </organization>
+   <licenses>
+      <license>
+         <name>Apache License 2.0</name>
+         <distribution>repo</distribution>
+         <url>https://spdx.org/licenses/Apache-2.0.html</url>
+      </license>
+   </licenses>
+
+
+   <developers>
+      <developer>
+         <id>vegardit</id>
+         <name>Vegard IT GmbH, Germany</name>
+         <email>vegardit@users.noreply.github.com</email>
+         <url>https://vegardit.com/</url>
+         <organization>Vegard IT GmbH, Germany</organization>
+         <organizationUrl>https://vegardit.com/</organizationUrl>
+      </developer>
+   </developers>
+
+
+   <scm>
+      <!-- http://maven.apache.org/scm/git.html -->
+      <url>https://github.com/vegardit/depcheck-maven-plugin</url>
+      <connection>scm:git:https://github.com/vegardit/depcheck-maven-plugin.git</connection>
+      <developerConnection>scm:git:https://github.com/vegardit/depcheck-maven-plugin.git</developerConnection>
+      <tag>HEAD</tag>
+   </scm>
+
+
+   <issueManagement>
+      <system>github.com</system>
+      <url>https://github.com/vegardit/depcheck-maven-plugin/issues</url>
+   </issueManagement>
+
+
+   <ciManagement>
+      <system>github.com</system>
+      <url>https://github.com/vegardit/depcheck-maven-plugin/actions</url>
+   </ciManagement>
+
+
+   <properties>
+      <skip.japicmp.cmp>true</skip.japicmp.cmp>
+
+      <java.version>8</java.version>
+
+      <!-- TODO https://github.com/sevntu-checkstyle/sevntu.checkstyle/pull/827 -->
+      <checkstyle.violation.ignore>RequireFailForTryCatchInJunit</checkstyle.violation.ignore>
+
+      <maven.minimum.version>3.5.4</maven.minimum.version>
+   </properties>
+
+
+   <dependencyManagement>
+      <dependencies>
+         <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-artifact</artifactId>
+            <version>${maven.minimum.version}</version>
+         </dependency>
+         <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-core</artifactId>
+            <version>${maven.minimum.version}</version>
+         </dependency>
+         <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+            <version>${maven.minimum.version}</version>
+         </dependency>
+         <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-settings</artifactId>
+            <version>${maven.minimum.version}</version>
+         </dependency>
+
+         <dependency>
+            <groupId>net.sf.jstuff</groupId>
+            <artifactId>jstuff-xml</artifactId>
+            <version>5.14.3</version>
+            <type>pom</type>
+            <scope>import</scope>
+         </dependency>
+      </dependencies>
+   </dependencyManagement>
+
+
+   <dependencies>
+      <dependency>
+         <groupId>net.sf.jstuff</groupId>
+         <artifactId>jstuff-xml</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>org.ow2.asm</groupId>
+         <artifactId>asm</artifactId>
+         <version>9.1</version>
+      </dependency>
+
+      <dependency>
+         <!-- http://maven.apache.org/plugin-tools/maven-plugin-plugin/examples/using-annotations.html -->
+         <groupId>org.apache.maven.plugin-tools</groupId>
+         <artifactId>maven-plugin-annotations</artifactId>
+         <version>3.6.0</version>
+         <!-- annotations are not needed for plugin execution so you can remove this dependency for execution with using provided scope -->
+         <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>org.apache.maven</groupId>
+         <artifactId>maven-core</artifactId>
+      </dependency>
+
+      <!-- test dependencies -->
+      <dependency>
+         <groupId>org.apache.maven.plugin-testing</groupId>
+         <artifactId>maven-plugin-testing-harness</artifactId>
+         <version>3.3.0</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <!-- https://stackoverflow.com/a/16707144/5116073 -->
+         <groupId>org.apache.maven</groupId>
+         <artifactId>maven-compat</artifactId>
+         <version>${maven.minimum.version}</version>
+         <scope>test</scope>
+      </dependency>
+
+      <!-- required for remote artifact resolution -->
+      <dependency>
+         <groupId>org.apache.maven.wagon</groupId>
+         <artifactId>wagon-http</artifactId>
+         <!-- 3.1.0 is compatible with Maven 3.5.4 -->
+         <version>3.1.0</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.maven.resolver</groupId>
+         <artifactId>maven-resolver-connector-basic</artifactId>
+         <!-- 1.1.1 is compatible with Maven 3.5.4 -->
+         <version>1.1.1</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.maven.resolver</groupId>
+         <artifactId>maven-resolver-transport-wagon</artifactId>
+         <!-- 1.1.1 is compatible with Maven 3.5.4 -->
+         <version>1.1.1</version>
+         <scope>test</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>slf4j-simple</artifactId>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>junit</groupId>
+         <artifactId>junit</artifactId>
+         <version>4.13.2</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.assertj</groupId>
+         <artifactId>assertj-core</artifactId>
+         <version>3.19.0</version>
+         <scope>test</scope>
+      </dependency>
+   </dependencies>
+
+
+   <build>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-plugin-plugin</artifactId>
+            <version>3.6.0</version>
+            <configuration>
+               <goalPrefix>depcheck</goalPrefix>
+            </configuration>
+            <executions>
+               <execution>
+                  <id>generate-helpmojo@generate-sources</id>
+                  <phase>generate-sources</phase>
+                  <goals>
+                     <goal>helpmojo</goal>
+                  </goals>
+               </execution>
+            </executions>
+         </plugin>
+      </plugins>
+   </build>
+</project>
