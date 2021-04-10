@@ -121,9 +121,9 @@ public class DepsAnalyzer {
 
    private MavenProject getReactorProject(final Artifact artifact) {
       for (final MavenProject p : mojo.getReactorProjects()) {
-         if (p.getGroupId().equals(artifact.getGroupId()) && //
-            p.getArtifactId().equals(artifact.getArtifactId()) && //
-            p.getVersion().equals(artifact.getVersion()) //
+         if (p.getGroupId().equals(artifact.getGroupId()) //
+            && p.getArtifactId().equals(artifact.getArtifactId()) //
+            && p.getVersion().equals(artifact.getVersion()) //
          )
             return p;
       }
@@ -142,9 +142,9 @@ public class DepsAnalyzer {
 
    private boolean isReactorProject(final Artifact artifact) {
       return mojo.getReactorProjects().stream().anyMatch(p -> //
-      p.getGroupId().equals(artifact.getGroupId()) && //
-         p.getArtifactId().equals(artifact.getArtifactId()) && //
-         p.getVersion().equals(artifact.getVersion()) //
+      p.getGroupId().equals(artifact.getGroupId()) //
+         && p.getArtifactId().equals(artifact.getArtifactId())//
+         && p.getVersion().equals(artifact.getVersion()) //
       );
    }
 
