@@ -78,7 +78,7 @@
       <!-- TODO https://github.com/sevntu-checkstyle/sevntu.checkstyle/pull/827 -->
       <checkstyle.violation.ignore>RequireFailForTryCatchInJunit</checkstyle.violation.ignore>
 
-      <maven.minimum.version>3.5.4</maven.minimum.version>
+      <maven.minimum.version>3.6.0</maven.minimum.version>
    </properties>
 
 
@@ -161,22 +161,22 @@
       <dependency>
          <groupId>org.apache.maven.wagon</groupId>
          <artifactId>wagon-http</artifactId>
-         <!-- 3.1.0 is compatible with Maven 3.5.4 -->
-         <version>3.1.0</version>
+         <!-- 3.2.0 is compatible with Maven 3.6.0 -->
+         <version>3.2.0</version>
          <scope>test</scope>
       </dependency>
       <dependency>
          <groupId>org.apache.maven.resolver</groupId>
          <artifactId>maven-resolver-connector-basic</artifactId>
-         <!-- 1.1.1 is compatible with Maven 3.5.4 -->
-         <version>1.1.1</version>
+         <!-- 1.3.1 is compatible with Maven 3.6.0 -->
+         <version>1.3.1</version>
          <scope>test</scope>
       </dependency>
       <dependency>
          <groupId>org.apache.maven.resolver</groupId>
          <artifactId>maven-resolver-transport-wagon</artifactId>
-         <!-- 1.1.1 is compatible with Maven 3.5.4 -->
-         <version>1.1.1</version>
+         <!-- 1.3.1 is compatible with Maven 3.6.0 -->
+         <version>1.3.1</version>
          <scope>test</scope>
       </dependency>
 

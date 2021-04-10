@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Minimum required Maven version change from 3.5.1 to 3.6.0
+
 
 ## [1.0.0] - 2021-03-13
 
