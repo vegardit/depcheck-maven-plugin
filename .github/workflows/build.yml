@@ -1,3 +1,8 @@
+# Copyright 2013-2021 by Vegard IT GmbH, Germany, https://vegardit.com
+# SPDX-License-Identifier: Apache-2.0
+#
+# Author: Sebastian Thomschke, Vegard IT GmbH
+#
 # https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions
 name: Build
 
@@ -55,7 +60,7 @@ jobs:
     #      ~/.xshare/${{ steps.java-version-checksum.outputs.md5sum }}
     #    key: ${{ runner.os }}-xshare-${{ steps.java-version-checksum.outputs.md5sum }}
 
-    - name: Cache local Maven repository
+    - name: "Cache: Local Maven Repository"
       uses: actions/cache@v2
       with:
         path: |
@@ -65,7 +70,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-mvnrepo-
 
-    - name: Cache Maven binary
+    - name: "Cache: Maven Binaries"
       uses: actions/cache@v2
       with:
         path: |
@@ -90,13 +95,15 @@ jobs:
         DEPLOY_SNAPSHOTS_TO_GITHUB_BRANCH: true
         GITHUB_USER: ${{ github.actor }}
         GITHUB_API_KEY: ${{ secrets.GH_API_TOKEN }}
+        JAVA_VERSION: ${{ matrix.java }}
+        MAY_CREATE_RELEASE: ${{ matrix.may_create_release }}
         SIGN_KEY: ${{ secrets.GPG_SIGN_KEY }}
         SIGN_KEY_PASS: ${{ secrets.GPG_SIGN_KEY_PWD }}
         SONATYPE_OSSRH_USER: ${{ secrets.SONATYPE_OSSRH_USER }}
         SONATYPE_OSSRH_USER_TOKEN: ${{ secrets.SONATYPE_OSSRH_USER_TOKEN }}
-        JAVA_VERSION: ${{ matrix.java }}
-        MAY_CREATE_RELEASE: ${{ matrix.may_create_release }}
       run: |
+        set -eu
+
         # https://github.community/t/github-actions-bot-email-address/17204
         git config user.name "github-actions[bot]"
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
