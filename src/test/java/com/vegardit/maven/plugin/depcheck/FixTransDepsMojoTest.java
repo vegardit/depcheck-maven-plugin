@@ -16,7 +16,7 @@ import org.junit.Test;
 
 import com.vegardit.maven.util.AbstractMavenTest;
 
-import net.sf.jstuff.core.collection.CollectionUtils;
+import net.sf.jstuff.core.collection.Sets;
 
 /**
  * @author Sebastian Thomschke, Vegard IT GmbH
@@ -40,7 +40,7 @@ public class FixTransDepsMojoTest extends AbstractMavenTest {
 
       // workaround for mavenProject.getArtifacts() returning null when run as test case
       final RepositorySystem repositorySystem = mojoRule.lookup(RepositorySystem.class);
-      sess.getCurrentProject().setArtifacts(CollectionUtils.newHashSet(repositorySystem.createArtifact("org.apache.commons", "commons-lang3", "3.12.0",
+      sess.getCurrentProject().setArtifacts(Sets.newHashSet(repositorySystem.createArtifact("org.apache.commons", "commons-lang3", "3.12.0",
          "jar")));
 
       final FixTransDepsMojo mojo = getMojo(sess, FixTransDepsMojo.MAVEN_GOAL);
