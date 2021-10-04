@@ -116,7 +116,7 @@ jobs:
         fi
 
     - name: Publish test coverage to codeclimate.com
-      uses: paambaati/codeclimate-action@v2.7.5 # https://github.com/paambaati/codeclimate-action
+      uses: paambaati/codeclimate-action@v3.0.0 # https://github.com/paambaati/codeclimate-action
       if: matrix.may_create_release && steps.maven-build.outputs.has_jacoco_results
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE_TEST_REPORTER_ID }}
