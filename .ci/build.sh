@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright 2013-2021 by Vegard IT GmbH, Germany, https://vegardit.com
+# Copyright 2013-2022 by Vegard IT GmbH, Germany, https://vegardit.com
 # SPDX-License-Identifier: Apache-2.0
 #
 # @author Sebastian Thomschke, Vegard IT GmbH
@@ -114,7 +114,7 @@ if [[ ${projectVersion:-foo} == ${POM_CURRENT_VERSION:-bar} && ${MAY_CREATE_RELE
    cp -f .ci/maven-settings.xml $HOME/.m2/settings.xml
    cp -f .ci/maven-toolchains.xml $HOME/.m2/toolchains.xml
 
-   if [[ "$TRAVIS" == "true" ]]; then
+   if [[ "${TRAVIS:-false}" == "true" ]]; then
       # workaround for "Git fatal: ref HEAD is not a symbolic ref" during release on Travis CI
       git checkout ${GIT_BRANCH}
    fi

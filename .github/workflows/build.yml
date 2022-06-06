@@ -1,4 +1,4 @@
-# Copyright 2013-2021 by Vegard IT GmbH, Germany, https://vegardit.com
+# Copyright 2013-2022 by Vegard IT GmbH, Germany, https://vegardit.com
 # SPDX-License-Identifier: Apache-2.0
 #
 # Author: Sebastian Thomschke, Vegard IT GmbH
@@ -25,6 +25,8 @@ on:
         required: false
         default: ''
 
+concurrency: ci-${{ github.ref }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -33,10 +35,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - java: 8
+        - java: 11
           may_create_release: ${{ github.ref == 'refs/heads/main' }}
           experimental: false
-        - java: 11
+        - java: 17
           may_create_release: false
           experimental: true
     steps:
