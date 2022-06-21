@@ -73,7 +73,7 @@
    <properties>
       <skip.japicmp.cmp>true</skip.japicmp.cmp>
 
-      <java.version>11</java.version>
+      <java.version>17</java.version>
 
       <maven.minimum.version>3.6.3</maven.minimum.version>
    </properties>
@@ -105,7 +105,7 @@
          <dependency>
             <groupId>net.sf.jstuff</groupId>
             <artifactId>jstuff-xml</artifactId>
-            <version>5.21.0</version>
+            <version>6.0.0</version>
             <type>pom</type>
             <scope>import</scope>
          </dependency>
