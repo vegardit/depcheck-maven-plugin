@@ -8,13 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [2.0.0] - 2022-06-21
+
 ### Changed
-- Minimum required Maven version change from 3.5.1 to 3.6.3
+- Minimum required JDK version changed from 8 to 11
+- Minimum required Maven version changed from 3.5.1 to 3.6.3
 - Change scope of maven plugin dependencies to `provided`
 - Upgraded dependencies:
-  - asm from 9.1 to 9.2
-  - maven-plugin-annotations from 3.6.0 to 3.6.1
-  - maven-plugin-plugin from 3.6.0 to 3.6.1
+  - asm from 9.1 to 9.3
+  - jstuff-xml from 5.14.3 to 6.0.0
+  - maven-plugin-annotations from 3.6.0 to 3.6.4
+  - maven-plugin-plugin from 3.6.0 to 3.6.4
 
 
 ## [1.0.0] - 2021-03-13
