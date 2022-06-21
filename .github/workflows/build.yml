@@ -40,7 +40,7 @@ jobs:
           experimental: false
         - java: 17
           may_create_release: false
-          experimental: true
+          experimental: false
     steps:
     - name: Git Checkout
       uses: actions/checkout@v3 #https://github.com/actions/checkout
