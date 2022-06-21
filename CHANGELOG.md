@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Minimum required Maven version change from 3.5.1 to 3.6.3
+- Change scope of maven plugin dependencies to `provided`
 - Upgraded dependencies:
   - asm from 9.1 to 9.2
   - maven-plugin-annotations from 3.6.0 to 3.6.1

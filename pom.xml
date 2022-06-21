@@ -73,7 +73,7 @@
    <properties>
       <skip.japicmp.cmp>true</skip.japicmp.cmp>
 
-      <java.version>17</java.version>
+      <java.version>11</java.version>
 
       <maven.minimum.version>3.6.3</maven.minimum.version>
    </properties>
@@ -85,21 +85,25 @@
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-artifact</artifactId>
             <version>${maven.minimum.version}</version>
+            <scope>provided</scope>
          </dependency>
          <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-core</artifactId>
             <version>${maven.minimum.version}</version>
+            <scope>provided</scope>
          </dependency>
          <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
             <version>${maven.minimum.version}</version>
+            <scope>provided</scope>
          </dependency>
          <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-settings</artifactId>
             <version>${maven.minimum.version}</version>
+            <scope>provided</scope>
          </dependency>
 
          <dependency>
