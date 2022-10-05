@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2021 by Sebastian Thomschke and contributors.
+ * SPDX-FileCopyrightText: © Vegard IT GmbH (https://vegardit.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.vegardit.maven.plugin.depcheck;
@@ -148,7 +148,8 @@ public class DepsAnalyzer {
       );
    }
 
-   public ScanResult scan(final boolean checkForUnusedDependencies, final boolean checkForUsedTransitiveDependencies) throws MojoExecutionException {
+   public ScanResult scan(final boolean checkForUnusedDependencies, final boolean checkForUsedTransitiveDependencies)
+      throws MojoExecutionException {
       final ScanResult result = new ScanResult(project);
 
       if (!isArtifactWithClasses(project.getArtifact()))
@@ -216,7 +217,8 @@ public class DepsAnalyzer {
             throw new MojoExecutionException("Analyzing dependency " + directDep + " failed with: " + ex.getMessage(), ex);
          }
       }
-      log.info(" => Found " + Pluralized.dependencies(directDeps.size(), "direct") + " with " + Pluralized.classes(directDepsClassCount) + ".");
+      log.info(" => Found " + Pluralized.dependencies(directDeps.size(), "direct") + " with " + Pluralized.classes(directDepsClassCount)
+         + ".");
       if (checkForUnusedDependencies) {
          if (result.hasUnusedDirectDependencies()) {
             log.warn(" => " + Pluralized.dependencies(result.unusedDirectDependencies.size(), "potentially unused") + " found:");
@@ -262,7 +264,8 @@ public class DepsAnalyzer {
          } else {
             final int usedTransClasses = result.usedClassesOfTransitiveDependencies.size();
             final int usedTransDeps = result.getUsedTransitiveDependencies().size();
-            log.warn(" => References to " + Pluralized.classes(usedTransClasses) + " of " + Pluralized.dependencies(usedTransDeps, "transitive") + " found.");
+            log.warn(" => References to " + Pluralized.classes(usedTransClasses) + " of " + Pluralized.dependencies(usedTransDeps,
+               "transitive") + " found.");
          }
       }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 by Vegard IT GmbH (https://vegardit.com) and contributors.
+ * SPDX-FileCopyrightText: © Vegard IT GmbH (https://vegardit.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.vegardit.maven.plugin.depcheck;
@@ -69,7 +69,8 @@ public final class FixTransDepsMojo extends AbstractMojo {
    String backupPomSuffix;
 
    private void backupPom(final File pomFile) throws MojoExecutionException {
-      final String backupPomFileName = (backupPomPrefix == null ? "" : backupPomPrefix) + pomFile.getName() + (backupPomSuffix == null ? "" : backupPomSuffix);
+      final String backupPomFileName = (backupPomPrefix == null ? "" : backupPomPrefix) + pomFile.getName() + (backupPomSuffix == null ? ""
+         : backupPomSuffix);
       final File backupPom = new File(pomFile.getParentFile(), backupPomFileName);
       log.debug("Creating backup of " + pomFile + "...");
       try {

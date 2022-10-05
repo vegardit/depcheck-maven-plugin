@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 by Vegard IT GmbH (https://vegardit.com) and contributors.
+ * SPDX-FileCopyrightText: © Vegard IT GmbH (https://vegardit.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.vegardit.maven.plugin.depcheck;

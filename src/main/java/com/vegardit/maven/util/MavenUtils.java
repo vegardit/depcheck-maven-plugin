@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 by Vegard IT GmbH (https://vegardit.com) and contributors.
+ * SPDX-FileCopyrightText: © Vegard IT GmbH (https://vegardit.com)
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.vegardit.maven.util;
@@ -28,10 +28,11 @@ public abstract class MavenUtils {
    public static Artifact dependencyToArtifact(final Dependency dependency, final RepositorySystem repositorySystem) {
       final Artifact artifact;
       if (Strings.isEmpty(dependency.getClassifier())) {
-         artifact = repositorySystem.createArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), dependency.getType());
+         artifact = repositorySystem.createArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), dependency
+            .getType());
       } else {
-         artifact = repositorySystem.createArtifactWithClassifier(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), dependency
-            .getType(), dependency.getClassifier());
+         artifact = repositorySystem.createArtifactWithClassifier(dependency.getGroupId(), dependency.getArtifactId(), dependency
+            .getVersion(), dependency.getType(), dependency.getClassifier());
       }
       artifact.setScope(dependency.getScope());
       return artifact;
@@ -73,14 +74,15 @@ public abstract class MavenUtils {
          return null;
 
       if (project.getFile() == null)
-         return project.getGroupId() + ":" + project.getArtifactId() + ":" + project.getPackaging() + ":" + project.getVersion() + " @ <unkown location>";
+         return project.getGroupId() + ":" + project.getArtifactId() + ":" + project.getPackaging() + ":" + project.getVersion()
+            + " @ <unkown location>";
 
-      return project.getGroupId() + ":" + project.getArtifactId() + ":" + project.getPackaging() + ":" + project.getVersion() + " @ " + project.getFile()
-         .getAbsolutePath();
+      return project.getGroupId() + ":" + project.getArtifactId() + ":" + project.getPackaging() + ":" + project.getVersion() + " @ "
+         + project.getFile().getAbsolutePath();
    }
 
    public static Set<Artifact> withoutRuntimeAndTestScoped(final Set<Artifact> artifacts) {
-      return artifacts.stream().filter(a -> !Artifact.SCOPE_RUNTIME.equals(a.getScope()) && !Artifact.SCOPE_TEST.equals(a.getScope())).collect(Collectors
-         .toSet());
+      return artifacts.stream().filter(a -> !Artifact.SCOPE_RUNTIME.equals(a.getScope()) && !Artifact.SCOPE_TEST.equals(a.getScope()))
+         .collect(Collectors.toSet());
    }
 }
