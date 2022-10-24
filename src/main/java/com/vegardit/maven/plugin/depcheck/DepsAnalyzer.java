@@ -304,8 +304,8 @@ public class DepsAnalyzer {
 
             String className = fileName;
             className = Strings.substringBeforeLast(className, ".class");
-            className = Strings.replaceChars(className, '/', '.');
-            className = Strings.replaceChars(className, '$', '.');
+            className = Strings.replace(className, '/', '.');
+            className = Strings.replace(className, '$', '.');
 
             if (isAnonymousInnerClass(className)) {
                continue;
