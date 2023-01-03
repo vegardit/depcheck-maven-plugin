@@ -1,6 +1,6 @@
 # depcheck-maven-plugin
 
-[![Build Status](https://img.shields.io/github/workflow/status/vegardit/depcheck-maven-plugin/Build)](https://github.com/vegardit/depcheck-maven-plugin/actions?query=workflow%3A%22Build%22)
+[![Build Status](https://github.com/vegardit/depcheck-maven-plugin/workflows/Build/badge.svg "GitHub Actions")](https://github.com/vegardit/depcheck-maven-plugin/actions?query=workflow%3A%22Build%22)
 [![License](https://img.shields.io/github/license/vegardit/depcheck-maven-plugin.svg?color=blue)](LICENSE.txt)
 [![Changelog](https://img.shields.io/badge/History-changelog-blue)](CHANGELOG.md)
 [![Maintainability](https://api.codeclimate.com/v1/badges/38f32c6acda045ed2337/maintainability)](https://codeclimate.com/github/vegardit/depcheck-maven-plugin/maintainability)
