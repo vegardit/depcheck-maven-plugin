@@ -3,10 +3,9 @@
   <groupId>com.vegardit.maven</groupId>
   <artifactId>depcheck-maven-plugin</artifactId>
   <versioning>
-    <latest>2.0.1-SNAPSHOT</latest>
     <versions>
       <version>2.0.1-SNAPSHOT</version>
     </versions>
-    <lastUpdated>20230130121616</lastUpdated>
+    <lastUpdated>20230504092627</lastUpdated>
   </versioning>
 </metadata>
