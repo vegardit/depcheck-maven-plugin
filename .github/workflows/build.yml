@@ -1,20 +1,23 @@
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+#
 # SPDX-FileCopyrightText: © Vegard IT GmbH (https://vegardit.com)
+# SPDX-FileContributor: Sebastian Thomschke
 # SPDX-License-Identifier: Apache-2.0
+# SPDX-ArtifactOfProjectHomePage: https://github.com/vegardit/depcheck-maven-plugin
 #
-# Author: Sebastian Thomschke, Vegard IT GmbH
-#
-# https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions
 name: Build
 
 on:
   push:
-    branches:
-    - '**'
-    tags-ignore:
+    branches-ignore: # build all branches except:
+      - 'dependabot/**' # prevent GHA triggered twice (once for commit to the branch and once for opening/syncing the PR)
+    tags-ignore: # don't build tags
     - '**'
     paths-ignore:
     - '**/*.adoc'
     - '**/*.md'
+    - '.editorconfig'
+    - '.git*'
     - '.github/*.yml'
   pull_request:
   workflow_dispatch:
@@ -24,8 +27,26 @@ on:
         description: 'Additional Maven Args'
         required: false
         default: ''
+      debug-with-ssh:
+        description: "Start an SSH session for debugging purposes after tests ran:"
+        default: never
+        type: choice
+        options: [ always, on_failure, on_failure_or_cancelled, never ]
+      debug-with-ssh-only-for-actor:
+        description: "Limit access to the SSH session to the GitHub user that triggered the job."
+        default: true
+        type: boolean
+      debug-with-ssh-only-jobs-matching:
+        description: "Only start an SSH session for jobs matching this regex pattern:"
+        default: ".*"
+        type: string
 
+# https://docs.github.com/en/actions/using-jobs/using-concurrency
 concurrency: ci-${{ github.ref }}
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   build:
@@ -36,19 +57,22 @@ jobs:
       matrix:
         include:
         - java: 11
-          may_create_release: ${{ github.ref == 'refs/heads/main' }}
+          may_create_release: ${{ github.ref_name == 'main' }}
           experimental: false
         - java: 17
           may_create_release: false
           experimental: false
     steps:
+    - name: Show environment variables
+      run: env | sort
+
     - name: Git Checkout
       uses: actions/checkout@v3 #https://github.com/actions/checkout
 
     - name: Set up JDK ${{ matrix.java }}
       uses: actions/setup-java@v3 #https://github.com/actions/setup-java
       with:
-        distribution: 'zulu'
+        distribution: temurin
         java-version: ${{ matrix.java }}
 
     # reusing CDS archives of the same JVM randomly fails in GitHub Actions with
@@ -56,7 +80,7 @@ jobs:
     #- name: Calculate Java version checksum
     #  id: java-version-checksum
     #  run: |
-    #    echo "::set-output name=md5sum::$(java -version 2>&1 | md5sum | cut -f1 -d" ")"
+    #    echo "md5sum=$(java -version 2>&1 | md5sum | cut -f1 -d" ")" >> $GITHUB_OUTPUT
     #- name: Cache Java CDS archive
     #  uses: actions/cache@v3
     #  with:
@@ -83,7 +107,7 @@ jobs:
 
     - name: Test with Maven
       id: maven-test
-      if: ${{ !matrix.may_create_release }}
+      if: ${{ !matrix.may_create_release || env.ACT }}
       env:
         GITHUB_USER: ${{ github.actor }}
         GITHUB_API_KEY: ${{ github.token }}
@@ -94,13 +118,13 @@ jobs:
 
     - name: Build with Maven
       id: maven-build
-      if: matrix.may_create_release
+      if: ${{ matrix.may_create_release && !env.ACT }}
       env:
         DEPLOY_SNAPSHOTS_TO_GITHUB_BRANCH: true
         GITHUB_USER: ${{ github.actor }}
         GITHUB_API_KEY: ${{ secrets.GH_API_TOKEN }}
         JAVA_VERSION: ${{ matrix.java }}
-        MAY_CREATE_RELEASE: ${{ matrix.may_create_release }}
+        MAY_CREATE_RELEASE: true
         SIGN_KEY: ${{ secrets.GPG_SIGN_KEY }}
         SIGN_KEY_PASS: ${{ secrets.GPG_SIGN_KEY_PWD }}
         SONATYPE_OSSRH_USER: ${{ secrets.SONATYPE_OSSRH_USER }}
@@ -119,7 +143,7 @@ jobs:
 
     - name: Publish test coverage to codeclimate.com
       uses: paambaati/codeclimate-action@v4.0.0 # https://github.com/paambaati/codeclimate-action
-      if: matrix.may_create_release && steps.maven-build.outputs.has_jacoco_results
+      if: ${{ matrix.may_create_release && steps.maven-build.outputs.has_jacoco_results && !env.ACT }}
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE_TEST_REPORTER_ID }}
         JACOCO_SOURCE_PATH: "${{ github.workspace }}/src/main/java"
@@ -127,3 +151,33 @@ jobs:
         coverageLocations:  |
           ${{ github.workspace }}/target/site/jacoco/jacoco.xml:jacoco
           ${{ github.workspace }}/target/site/jacoco-it/jacoco.xml:jacoco
+
+
+    ##################################################
+    # Setup SSH debug session
+    ##################################################
+    - name: "SSH session for debugging: check"
+      id: DEBUG_SSH_SESSSION_CHECK
+      if: always()
+      shell: bash
+      run: |
+        set -eu
+        job_filter_pattern="${{ inputs.debug-with-ssh-only-jobs-matching }}"
+        echo "job_filter: $job_filter_pattern"
+
+        job_info=$(echo "$GITHUB_JOB ${{ runner.os }} haxe-${{ matrix.haxe-version }}" | tr -d '\n')
+        echo "job_info: $job_info"
+
+        if [[ "$job_info" =~ .*$job_filter_pattern.* ]] && case "${{ job.status }}" in
+           success)   [[ "${{ inputs.debug-with-ssh }}" == always ]] ;;
+           cancelled) [[ "${{ inputs.debug-with-ssh }}" == on_failure_or_cancelled ]] ;;
+           failure)   [[ "${{ inputs.debug-with-ssh }}" =~ on_failure.* ]] ;;
+        esac; then
+           echo "start_session=true" | tee -a "$GITHUB_OUTPUT"
+        fi
+
+    - name: "SSH session for debugging: start"
+      uses: mxschmitt/action-tmate@v3 # https://github.com/mxschmitt/action-tmate
+      if: always() && steps.DEBUG_SSH_SESSSION_CHECK.outputs.start_session
+      with:
+        limit-access-to-actor: ${{ inputs.debug-with-ssh-only-for-actor }}
