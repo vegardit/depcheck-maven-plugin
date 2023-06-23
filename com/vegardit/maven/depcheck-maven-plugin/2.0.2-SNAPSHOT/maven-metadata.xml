@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+  <groupId>com.vegardit.maven</groupId>
+  <artifactId>depcheck-maven-plugin</artifactId>
+  <versioning>
+    <lastUpdated>20230623213825</lastUpdated>
+    <snapshot>
+      <timestamp>20230623.213825</timestamp>
+      <buildNumber>1</buildNumber>
+    </snapshot>
+    <snapshotVersions>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>2.0.2-20230623.213825-1</value>
+        <updated>20230623213825</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>jar</extension>
+        <value>2.0.2-20230623.213825-1</value>
+        <updated>20230623213825</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <classifier>sources</classifier>
+        <extension>jar</extension>
+        <value>2.0.2-20230623.213825-1</value>
+        <updated>20230623213825</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+  <version>2.0.2-SNAPSHOT</version>
+</metadata>
