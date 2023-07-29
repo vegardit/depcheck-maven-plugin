@@ -221,6 +221,7 @@
             <version>3.9.0</version>
             <configuration>
                <goalPrefix>depcheck</goalPrefix>
+               <helpPackageName>com.vegardit.maven.plugin.depcheck</helpPackageName>
             </configuration>
             <executions>
                <execution>
