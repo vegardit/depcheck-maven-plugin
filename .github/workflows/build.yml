@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: © Vegard IT GmbH (https://vegardit.com)
-# SPDX-FileContributor: Sebastian Thomschke
+# SPDX-FileContributor: Sebastian Thomschke (Vegard IT GmbH)
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-ArtifactOfProjectHomePage: https://github.com/vegardit/depcheck-maven-plugin
 #
@@ -33,7 +33,7 @@ on:
         required: false
         default: ''
       debug-with-ssh:
-        description: "Start an SSH session for debugging purposes after tests ran:"
+        description: "Start an SSH session for debugging purposes at the end of the build:"
         default: never
         type: choice
         options: [ always, on_failure, on_failure_or_cancelled, never ]
@@ -46,15 +46,17 @@ on:
         default: ".*"
         type: string
 
-# https://docs.github.com/en/actions/using-jobs/using-concurrency
-concurrency: ci-${{ github.ref }}
 
 defaults:
   run:
     shell: bash
 
+
 jobs:
-  build:
+
+  ###########################################################
+  maven-build:
+  ###########################################################
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.experimental }}
     strategy:
@@ -67,21 +69,32 @@ jobs:
         - java: 17
           may_create_release: false
           experimental: false
-        - java: 20
+        - java: 20 # TODO 21 requires ecj 3.36.0
           may_create_release: false
           experimental: false
+
+
+    # https://docs.github.com/en/actions/using-jobs/using-concurrency
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.java }}
+      cancel-in-progress: false
+
+
     steps:
     - name: Show environment variables
       run: env | sort
 
-    - name: Git Checkout
-      uses: actions/checkout@v4 #https://github.com/actions/checkout
 
-    - name: Set up JDK ${{ matrix.java }}
-      uses: actions/setup-java@v4 #https://github.com/actions/setup-java
+    - name: Git Checkout
+      uses: actions/checkout@v4 # https://github.com/actions/checkout
+
+
+    - name: "Install: JDK ${{ env.JAVA_VERSION }}"
+      uses: actions/setup-java@v4 # https://github.com/actions/setup-java
       with:
         distribution: temurin
         java-version: ${{ matrix.java }}
+
 
     # reusing CDS archives of the same JVM randomly fails in GitHub Actions with
     # "An error has occurred while processing the shared archive file. shared class paths mismatch"
@@ -96,25 +109,20 @@ jobs:
     #      ~/.xshare/${{ steps.java-version-checksum.outputs.md5sum }}
     #    key: ${{ runner.os }}-xshare-${{ steps.java-version-checksum.outputs.md5sum }}
 
-    - name: "Cache: Local Maven Repository"
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.m2/repository
-          !~/.m2/repository/com/vegardit/maven
-        key: ${{ runner.os }}-mvnrepo-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-mvnrepo-
 
-    - name: "Cache: Maven Binaries"
-      uses: actions/cache@v3
+    - name: "Cache: Restore"
+      id: cache-restore
+      if: ${{ !env.ACT }} # https://github.com/nektos/act#skipping-steps
+      uses: actions/cache/restore@v3
       with:
         path: |
           ~/.m2/bin
-        key: ${{ runner.os }}-mvnbin-${{ hashFiles('.ci/build.sh') }}
+          ~/.m2/repository
+          !~/.m2/repository/com/vegardit/maven
+        key: ${{ runner.os }}-java${{ matrix.java }}-${{ hashFiles('**/pom.xml') }}
+
 
     - name: Test with Maven
-      id: maven-test
       if: ${{ !matrix.may_create_release || env.ACT }}
       env:
         GITHUB_USER: ${{ github.actor }}
@@ -124,8 +132,8 @@ jobs:
       run: |
         bash .ci/build.sh ${{ github.event.inputs.additional_maven_args }}
 
+
     - name: Build with Maven
-      id: maven-build
       if: ${{ matrix.may_create_release && !env.ACT }}
       env:
         DEPLOY_SNAPSHOTS_TO_GITHUB_BRANCH: true
@@ -149,6 +157,7 @@ jobs:
           echo 'has_jacoco_results=true' >> $GITHUB_OUTPUT
         fi
 
+
     - name: Publish test coverage to codeclimate.com
       uses: paambaati/codeclimate-action@v5.0.0 # https://github.com/paambaati/codeclimate-action
       if: ${{ matrix.may_create_release && steps.maven-build.outputs.has_jacoco_results && !env.ACT }}
@@ -162,39 +171,70 @@ jobs:
 
 
     ##################################################
+    # Cache Update
+    # See https://github.com/actions/cache/issues/342#issuecomment-1399442670
+    ##################################################
+    - name: "Cache: Delete Previous"
+      if: ${{ steps.cache-restore.outputs.cache-hit && !env.ACT }}
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        gh extension install actions/gh-actions-cache
+        # "|| true" is to avoid "Error: Resource not accessible by integration" from failing the job 
+        gh actions-cache delete ${{ steps.cache-restore.outputs.cache-primary-key }} --confirm || true
+
+    - name: "Cache: Update"
+      uses: actions/cache/save@v3
+      if: ${{ always() && !cancelled() && !env.ACT }} # save cache even fails
+      with:
+        path: |
+          ~/.m2/bin
+          ~/.m2/repository
+          !~/.m2/repository/com/vegardit/maven
+          !~/.m2/repository/*SNAPSHOT*
+        key: ${{ steps.cache-restore.outputs.cache-primary-key }}
+
+
+    ##################################################
     # Setup SSH debug session
     ##################################################
     - name: "SSH session for debugging: check"
       id: DEBUG_SSH_SESSSION_CHECK
       if: always()
-      shell: bash
       run: |
         set -eu
         job_filter_pattern="${{ inputs.debug-with-ssh-only-jobs-matching }}"
         echo "job_filter: $job_filter_pattern"
 
-        job_info=$(echo "$GITHUB_JOB ${{ runner.os }} haxe-${{ matrix.haxe-version }}" | tr -d '\n')
+        job_info=$(echo "$GITHUB_JOB ${{ runner.os }} java-${{ matrix.java }}" | tr -d '\n')
         echo "job_info: $job_info"
 
-        if [[ "$job_info" =~ .*$job_filter_pattern.* ]] && case "${{ job.status }}" in
-           success)   [[ "${{ inputs.debug-with-ssh }}" == always ]] ;;
-           cancelled) [[ "${{ inputs.debug-with-ssh }}" == on_failure_or_cancelled ]] ;;
-           failure)   [[ "${{ inputs.debug-with-ssh }}" =~ on_failure.* ]] ;;
+        when="${{ inputs.debug-with-ssh }}"
+
+        if [[ $when == "always" ]] || [[ "$job_info" =~ .*$job_filter_pattern.* ]] && case "${{ job.status }}" in
+          success)   [[ $when == "always" ]] ;;
+          cancelled) [[ $when == "on_failure_or_cancelled" ]] ;;
+          failure)   [[ $when == "on_failure"* ]] ;;
         esac; then
-           echo "start_session=true" | tee -a "$GITHUB_OUTPUT"
+          echo "start_ssh_session=true" | tee -a "$GITHUB_OUTPUT"
         fi
+
 
     - name: "SSH session for debugging: start"
       uses: mxschmitt/action-tmate@v3 # https://github.com/mxschmitt/action-tmate
-      if: always() && steps.DEBUG_SSH_SESSSION_CHECK.outputs.start_session
+      if: always() && steps.DEBUG_SSH_SESSSION_CHECK.outputs.start_ssh_session
       with:
         limit-access-to-actor: ${{ inputs.debug-with-ssh-only-for-actor }}
 
 
+  ###########################################################
   dependabot-pr-auto-merge:
-    needs: build
+  ###########################################################
+    needs: maven-build
     if: ${{ github.event_name == 'pull_request' && github.actor == 'dependabot[bot]' }}
     runs-on: ubuntu-latest
+
+    concurrency: dependabot-pr-auto-merge
 
     permissions:
       contents: write
@@ -206,6 +246,7 @@ jobs:
       uses: dependabot/fetch-metadata@v1 # https://github.com/dependabot/fetch-metadata/
       with:
         github-token: "${{ secrets.GITHUB_TOKEN }}"
+
 
     - name: Enable auto-merge for Dependabot PRs
       if: |
