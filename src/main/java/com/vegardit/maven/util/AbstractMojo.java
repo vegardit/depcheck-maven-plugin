@@ -132,7 +132,7 @@ public abstract class AbstractMojo implements Mojo {
     */
    public Set<Artifact> getTransitiveDependencies() {
 
-      final Set<Artifact> deps = new HashSet<>(mvnCurrentProject.getArtifacts());
+      final var deps = new HashSet<>(mvnCurrentProject.getArtifacts());
       deps.removeAll(getDirectDependencies());
 
       if (verbose) {

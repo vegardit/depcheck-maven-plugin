@@ -54,7 +54,7 @@ public abstract class AbstractClassAnalyzer {
 
    private void initClassVisitor() {
 
-      final AnnotationVisitor annotationVisitor = new AnnotationVisitor(asmAPI) {
+      final var annotationVisitor = new AnnotationVisitor(asmAPI) {
          @Override
          public void visit(final String name, final Object value) {
             if (value instanceof org.objectweb.asm.Type) {
@@ -70,7 +70,7 @@ public abstract class AbstractClassAnalyzer {
          }
       };
 
-      final FieldVisitor fieldVisitor = new FieldVisitor(asmAPI) {
+      final var fieldVisitor = new FieldVisitor(asmAPI) {
          @Override
          public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
             parseSignature(descriptor);
@@ -78,7 +78,7 @@ public abstract class AbstractClassAnalyzer {
          }
       };
 
-      final MethodVisitor methodVisitor = new MethodVisitor(asmAPI) {
+      final var methodVisitor = new MethodVisitor(asmAPI) {
 
          @Override
          public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
@@ -94,7 +94,7 @@ public abstract class AbstractClassAnalyzer {
 
          @Override
          public AnnotationVisitor visitInsnAnnotation(final int typeRef, final TypePath typePath, final String descriptor,
-            final boolean visible) {
+               final boolean visible) {
             parseSignature(descriptor);
             return annotationVisitor;
          }
@@ -108,7 +108,7 @@ public abstract class AbstractClassAnalyzer {
 
          @Override
          public void visitLocalVariable(final String name, final String descriptor, final String signature, final Label start,
-            final Label end, final int index) {
+               final Label end, final int index) {
             if ("this".equals(name) || "super".equals(name))
                return;
             parseSignature(signature == null ? descriptor : signature);
@@ -116,7 +116,7 @@ public abstract class AbstractClassAnalyzer {
 
          @Override
          public AnnotationVisitor visitLocalVariableAnnotation(final int typeRef, final TypePath typePath, final Label[] start,
-            final Label[] end, final int[] index, final String descriptor, final boolean visible) {
+               final Label[] end, final int[] index, final String descriptor, final boolean visible) {
             parseSignature(descriptor);
             return annotationVisitor;
          }
@@ -140,7 +140,7 @@ public abstract class AbstractClassAnalyzer {
 
          @Override
          public AnnotationVisitor visitTryCatchAnnotation(final int typeRef, final TypePath typePath, final String descriptor,
-            final boolean visible) {
+               final boolean visible) {
             parseSignature(descriptor);
             return annotationVisitor;
          }
@@ -152,7 +152,7 @@ public abstract class AbstractClassAnalyzer {
 
          @Override
          public AnnotationVisitor visitTypeAnnotation(final int typeRef, final TypePath typePath, final String descriptor,
-            final boolean visible) {
+               final boolean visible) {
             parseSignature(descriptor);
             return annotationVisitor;
          }
@@ -166,7 +166,7 @@ public abstract class AbstractClassAnalyzer {
       classVisitor = new ClassVisitor(asmAPI) {
          @Override
          public void visit(final int version, final int access, final String name, final String signature, final String superName,
-            final String[] interfaces) {
+               final String[] interfaces) {
             reportClassReference(superName);
             if (interfaces != null) {
                for (final String internalClassName : interfaces) {
@@ -186,7 +186,7 @@ public abstract class AbstractClassAnalyzer {
 
          @Override
          public FieldVisitor visitField(final int access, final String name, final String descriptor, final String signature,
-            final Object value) {
+               final Object value) {
             parseSignature(signature == null ? descriptor : signature);
             if (value instanceof Type) {
                reportClassReference(((Type) value).getInternalName());
@@ -196,7 +196,7 @@ public abstract class AbstractClassAnalyzer {
 
          @Override
          public MethodVisitor visitMethod(final int access, final String name, final String descriptor, final String signature,
-            final String[] exceptions) {
+               final String[] exceptions) {
             parseSignature(signature == null ? descriptor : signature);
             if (exceptions != null) {
                for (final String internalClassName : exceptions) {
@@ -208,7 +208,7 @@ public abstract class AbstractClassAnalyzer {
 
          @Override
          public AnnotationVisitor visitTypeAnnotation(final int typeRef, final TypePath typePath, final String descriptor,
-            final boolean visible) {
+               final boolean visible) {
             parseSignature(descriptor);
             return annotationVisitor;
          }
@@ -240,7 +240,7 @@ public abstract class AbstractClassAnalyzer {
    }
 
    public void scan(final InputStream classByteCode) throws IOException {
-      final ClassReader cr = new ClassReader(classByteCode);
+      final var cr = new ClassReader(classByteCode);
       onClassName(Strings.replaceChars(cr.getClassName(), "/\\", "."));
       cr.accept(classVisitor, ClassReader.SKIP_FRAMES);
    }

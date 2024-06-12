@@ -7,7 +7,6 @@ package com.vegardit.maven.plugin.depcheck;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -85,7 +84,7 @@ public class DepsAnalyzer {
     */
    private Map<String, Artifact> getClassesDeclaredByTransitiveDependencies() throws MojoExecutionException {
 
-      final Map<String, Artifact> classesDeclaredByTransitiveDependencies = new HashMap<>();
+      final var classesDeclaredByTransitiveDependencies = new HashMap<String, Artifact>();
       for (final Artifact transDep : MavenUtils.withoutRuntimeAndTestScoped(mojo.getTransitiveDependencies())) {
          if (!isArtifactWithClasses(transDep)) {
             if (isVerbose) {
@@ -122,8 +121,8 @@ public class DepsAnalyzer {
    private MavenProject getReactorProject(final Artifact artifact) {
       for (final MavenProject p : mojo.getReactorProjects()) {
          if (p.getGroupId().equals(artifact.getGroupId()) //
-            && p.getArtifactId().equals(artifact.getArtifactId()) //
-            && p.getVersion().equals(artifact.getVersion()) //
+               && p.getArtifactId().equals(artifact.getArtifactId()) //
+               && p.getVersion().equals(artifact.getVersion()) //
          )
             return p;
       }
@@ -143,14 +142,14 @@ public class DepsAnalyzer {
    private boolean isReactorProject(final Artifact artifact) {
       return mojo.getReactorProjects().stream().anyMatch(p -> //
       p.getGroupId().equals(artifact.getGroupId()) //
-         && p.getArtifactId().equals(artifact.getArtifactId())//
-         && p.getVersion().equals(artifact.getVersion()) //
+            && p.getArtifactId().equals(artifact.getArtifactId())//
+            && p.getVersion().equals(artifact.getVersion()) //
       );
    }
 
    public ScanResult scan(final boolean checkForUnusedDependencies, final boolean checkForUsedTransitiveDependencies)
-      throws MojoExecutionException {
-      final ScanResult result = new ScanResult(project);
+         throws MojoExecutionException {
+      final var result = new ScanResult(project);
 
       if (!isArtifactWithClasses(project.getArtifact()))
          return result;
@@ -218,7 +217,7 @@ public class DepsAnalyzer {
          }
       }
       log.info(" => Found " + Pluralized.dependencies(directDeps.size(), "direct") + " with " + Pluralized.classes(directDepsClassCount)
-         + ".");
+            + ".");
       if (checkForUnusedDependencies) {
          if (result.hasUnusedDirectDependencies()) {
             log.warn(" => " + Pluralized.dependencies(result.unusedDirectDependencies.size(), "potentially unused") + " found:");
@@ -285,8 +284,8 @@ public class DepsAnalyzer {
       if (artifactWithJar.getFile() == null)
          return Collections.emptySet();
 
-      try (JarFile jar = new JarFile(artifactWithJar.getFile())) {
-         final Set<String> classesDeclaredInJar = new HashSet<>();
+      try (var jar = new JarFile(artifactWithJar.getFile())) {
+         final var classesDeclaredInJar = new HashSet<String>();
          // iterate over the jar's entries
          for (final JarEntry jarEntry : Enumerations.toIterable(jar.entries())) {
 
@@ -338,8 +337,8 @@ public class DepsAnalyzer {
          return Tuple2.create(Collections.emptySet(), Collections.emptySet());
       }
 
-      final Set<String> declaredClasses = new HashSet<>(); // classes declared by current project
-      final Set<String> referencedClasses = new HashSet<>(); // classes referenced by current project
+      final var declaredClasses = new HashSet<String>(); // classes declared by current project
+      final var referencedClasses = new HashSet<String>(); // classes referenced by current project
 
       Files.walkFileTree(classDirectory, new SimpleFileVisitor<Path>() {
          @Override
@@ -352,7 +351,7 @@ public class DepsAnalyzer {
                log.info(" -> Analyzing class file: " + file);
             }
 
-            try (InputStream classByteCode = new BufferedInputStream(Files.newInputStream(file))) {
+            try (var classByteCode = new BufferedInputStream(Files.newInputStream(file))) {
                new AbstractClassAnalyzer(Opcodes.ASM9) {
                   @Override
                   protected void onClassName(final String nameOfReferencedClass) {

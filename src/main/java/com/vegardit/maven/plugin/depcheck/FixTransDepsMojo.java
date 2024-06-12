@@ -70,8 +70,8 @@ public final class FixTransDepsMojo extends AbstractMojo {
 
    private void backupPom(final File pomFile) throws MojoExecutionException {
       final String backupPomFileName = (backupPomPrefix == null ? "" : backupPomPrefix) + pomFile.getName() + (backupPomSuffix == null ? ""
-         : backupPomSuffix);
-      final File backupPom = new File(pomFile.getParentFile(), backupPomFileName);
+            : backupPomSuffix);
+      final var backupPom = new File(pomFile.getParentFile(), backupPomFileName);
       log.debug("Creating backup of " + pomFile + "...");
       try {
          Files.copy(pomFile, backupPom);
@@ -163,7 +163,7 @@ public final class FixTransDepsMojo extends AbstractMojo {
       /*
        * construct new pom content
        */
-      final StringBuilder pomContentNew = new StringBuilder() //
+      final var pomContentNew = new StringBuilder() //
          .append(pomContent.substring(0, insertBefore)).append(newline);
 
       if (insertDependenciesTag) {

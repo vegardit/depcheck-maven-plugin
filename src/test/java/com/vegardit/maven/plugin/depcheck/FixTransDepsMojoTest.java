@@ -4,7 +4,7 @@
  */
 package com.vegardit.maven.plugin.depcheck;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -49,10 +49,10 @@ public class FixTransDepsMojoTest extends AbstractMavenTest {
       mojo.backupPomPrefix = "foo";
       mojo.backupPomSuffix = "bar";
 
-      final File pom = new File(sess.getCurrentProject().getBasedir(), "pom.xml");
+      final var pom = new File(sess.getCurrentProject().getBasedir(), "pom.xml");
       final String pomOriginalContent = FileUtils.readFileToString(pom, Charset.defaultCharset());
 
-      final File pomBackup = new File(sess.getCurrentProject().getBasedir(), mojo.backupPomPrefix + "pom.xml" + mojo.backupPomSuffix);
+      final var pomBackup = new File(sess.getCurrentProject().getBasedir(), mojo.backupPomPrefix + "pom.xml" + mojo.backupPomSuffix);
       assertThat(pomBackup).doesNotExist();
 
       assertThat(pomOriginalContent).doesNotContain("<artifactId>commons-lang3</artifactId>");

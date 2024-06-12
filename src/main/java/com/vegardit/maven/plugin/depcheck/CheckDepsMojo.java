@@ -4,7 +4,7 @@
  */
 package com.vegardit.maven.plugin.depcheck;
 
-import static net.sf.jstuff.core.Strings.*;
+import static net.sf.jstuff.core.Strings.NEW_LINE;
 
 import java.util.Arrays;
 import java.util.List;
@@ -94,7 +94,7 @@ public final class CheckDepsMojo extends AbstractMojo {
          return;
       }
 
-      final StringBuilder sb = new StringBuilder();
+      final var sb = new StringBuilder();
 
       sb.append("The following violations have been detected:").append(NEW_LINE);
       for (final DepsAnalyzer.ScanResult result : results) {
