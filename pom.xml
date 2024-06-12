@@ -25,6 +25,7 @@
    <url>https://github.com/vegardit/depcheck-maven-plugin</url>
    <inceptionYear>2013</inceptionYear>
    <organization>
+      <!-- used as Specification/Implementation-Vendor in MANIFEST.MF -->
       <name>Vegard IT GmbH, Germany</name>
       <url>https://vegardit.com/</url>
    </organization>
@@ -32,21 +33,16 @@
       <license>
          <name>Apache License 2.0</name>
          <distribution>repo</distribution>
-         <url>https://spdx.org/licenses/Apache-2.0.html</url>
+         <url>https://spdx.org/licenses/Apache-2.0</url>
       </license>
    </licenses>
 
 
-   <developers>
-      <developer>
-         <id>vegardit</id>
-         <name>Vegard IT GmbH, Germany</name>
-         <email>vegardit@users.noreply.github.com</email>
-         <url>https://vegardit.com/</url>
-         <organization>Vegard IT GmbH, Germany</organization>
-         <organizationUrl>https://vegardit.com/</organizationUrl>
-      </developer>
-   </developers>
+   <properties>
+      <java.version>11</java.version>
+      <skip.japicmp.cmp>true</skip.japicmp.cmp>
+      <maven.minimum.version>3.6.3</maven.minimum.version>
+   </properties>
 
 
    <scm>
@@ -68,15 +64,6 @@
       <system>github.com</system>
       <url>https://github.com/vegardit/depcheck-maven-plugin/actions</url>
    </ciManagement>
-
-
-   <properties>
-      <skip.japicmp.cmp>true</skip.japicmp.cmp>
-
-      <java.version>11</java.version>
-
-      <maven.minimum.version>3.6.3</maven.minimum.version>
-   </properties>
 
 
    <dependencyManagement>
