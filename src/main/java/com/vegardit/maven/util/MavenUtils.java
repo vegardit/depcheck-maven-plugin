@@ -39,10 +39,10 @@ public abstract class MavenUtils {
    }
 
    public static void resolveArtifact( //
-      final Artifact artifact, //
-      final RepositorySystem repositorySystem, //
-      final List<ArtifactRepository> remoteRepositories, //
-      final ArtifactRepository localRepository //
+         final Artifact artifact, //
+         final RepositorySystem repositorySystem, //
+         final List<ArtifactRepository> remoteRepositories, //
+         final ArtifactRepository localRepository //
    ) throws MojoExecutionException {
       Args.notNull("artifact", artifact);
       if (artifact.isResolved())
@@ -59,10 +59,10 @@ public abstract class MavenUtils {
    }
 
    public static Artifact resolveArtifact( //
-      final Dependency dependency, //
-      final RepositorySystem repositorySystem, //
-      final List<ArtifactRepository> remoteRepositories, //
-      final ArtifactRepository localRepository //
+         final Dependency dependency, //
+         final RepositorySystem repositorySystem, //
+         final List<ArtifactRepository> remoteRepositories, //
+         final ArtifactRepository localRepository //
    ) throws MojoExecutionException {
       final Artifact artifact = dependencyToArtifact(dependency, repositorySystem);
       resolveArtifact(artifact, repositorySystem, remoteRepositories, localRepository);
@@ -75,10 +75,10 @@ public abstract class MavenUtils {
 
       if (project.getFile() == null)
          return project.getGroupId() + ":" + project.getArtifactId() + ":" + project.getPackaging() + ":" + project.getVersion()
-            + " @ <unkown location>";
+               + " @ <unkown location>";
 
       return project.getGroupId() + ":" + project.getArtifactId() + ":" + project.getPackaging() + ":" + project.getVersion() + " @ "
-         + project.getFile().getAbsolutePath();
+            + project.getFile().getAbsolutePath();
    }
 
    public static Set<Artifact> withoutRuntimeAndTestScoped(final Set<Artifact> artifacts) {

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
 # SPDX-FileCopyrightText: © Vegard IT GmbH (https://vegardit.com)
+# SPDX-FileContributor: Sebastian Thomschke (Vegard IT GmbH)
 # SPDX-License-Identifier: Apache-2.0
-#
-# @author Sebastian Thomschke, Vegard IT GmbH
+# SPDX-ArtifactOfProjectHomePage: https://github.com/vegardit/depcheck-maven-plugin
 
 #####################
 # Script init
@@ -40,60 +40,25 @@ GIT_BRANCH=$(git branch --show-current)
 echo "  -> GIT Branch: $GIT_BRANCH"; echo
 
 
-if ! hash mvn 2>/dev/null; then
-   echo
-   echo "###################################################"
-   echo "# Determinig latest Maven version...              #"
-   echo "###################################################"
-   #MAVEN_VERSION=$(curl -sSf https://repo1.maven.org/maven2/org/apache/maven/apache-maven/maven-metadata.xml | grep -oP '(?<=latest>).*(?=</latest)')
-   MAVEN_VERSION=$(curl -sSf https://dlcdn.apache.org/maven/maven-3/ | grep -oP '(?<=>)[0-9.]+(?=/</a)' | tail -1)
-   echo "  -> Latest Maven Version: ${MAVEN_VERSION}"
-   if [[ ! -e $HOME/.m2/bin/apache-maven-$MAVEN_VERSION ]]; then
-      echo
-      echo "###################################################"
-      echo "# Installing Maven version $MAVEN_VERSION...               #"
-      echo "###################################################"
-      mkdir -p $HOME/.m2/bin/
-      #maven_download_url="https://repo1.maven.org/maven2/org/apache/maven/apache-maven/${MAVEN_VERSION}/apache-maven-${MAVEN_VERSION}-bin.tar.gz"
-      maven_download_url="https://dlcdn.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz"
-      echo "Downloading [$maven_download_url]..."
-      curl -fsSL $maven_download_url | tar zxv -C $HOME/.m2/bin/
-   fi
-   export M2_HOME=$HOME/.m2/bin/apache-maven-$MAVEN_VERSION
-   export PATH=$M2_HOME/bin:$PATH
-fi
-
-
-echo
-echo "###################################################"
-echo "# Configuring JDK Class Data Sharing...           #"
-echo "###################################################"
-java_version=$(java -version 2>&1)
-echo "$java_version"
-# https://docs.oracle.com/javase/8/docs/technotes/guides/vm/class-data-sharing.html
-jdk_version_checksum=$(echo "$java_version" | md5sum | cut -f1 -d" ")
-if [[ ! -f $HOME/.xshare/$jdk_version_checksum ]]; then
-   echo "  -> Generating shared class data archive..."
-   mkdir -p $HOME/.xshare
-   java -Xshare:dump -XX:+UnlockDiagnosticVMOptions -XX:SharedArchiveFile=$HOME/.xshare/$jdk_version_checksum
-else
-   echo "  -> Reusing shared class data archive..."
-fi
-export JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:-} -Xshare:on -XX:+UnlockDiagnosticVMOptions -XX:SharedArchiveFile=$HOME/.xshare/$jdk_version_checksum"
-
-
 echo
 echo "###################################################"
 echo "# Configuring MAVEN_OPTS...                       #"
 echo "###################################################"
 MAVEN_OPTS="${MAVEN_OPTS:-}"
-MAVEN_OPTS="$MAVEN_OPTS -XX:+TieredCompilation -XX:TieredStopAtLevel=1" # https://zeroturnaround.com/rebellabs/your-maven-build-is-slow-speed-it-up/
-MAVEN_OPTS="$MAVEN_OPTS -Djava.security.egd=file:/dev/./urandom" # https://stackoverflow.com/questions/58991966/what-java-security-egd-option-is-for/59097932#59097932
-MAVEN_OPTS="$MAVEN_OPTS -Dorg.slf4j.simpleLogger.showDateTime=true -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss,SSS" # https://stackoverflow.com/questions/5120470/how-to-time-the-different-stages-of-maven-execution/49494561#49494561
-export MAVEN_OPTS="$MAVEN_OPTS -Xmx1024m -Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -Dhttps.protocols=TLSv1.2"
+MAVEN_OPTS+=" -Djava.security.egd=file:/dev/./urandom" # https://stackoverflow.com/questions/58991966/what-java-security-egd-option-is-for/59097932#59097932
+MAVEN_OPTS+=" -Dorg.slf4j.simpleLogger.showDateTime=true -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss,SSS" # https://stackoverflow.com/questions/5120470/how-to-time-the-different-stages-of-maven-execution/49494561#49494561
+MAVEN_OPTS+=" -Xmx1024m -Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -Dhttps.protocols=TLSv1.3,TLSv1.2"
 echo "  -> MAVEN_OPTS: $MAVEN_OPTS"
+export MAVEN_OPTS
 
-MAVEN_CLI_OPTS="-e -U --batch-mode --show-version --no-transfer-progress -s .ci/maven-settings.xml -t .ci/maven-toolchains.xml"
+MAVEN_CLI_OPTS="-e -U --batch-mode --show-version -s .ci/maven-settings.xml -t .ci/maven-toolchains.xml"
+if [[ -n ${GITEA_ACTIONS:-} || (-n ${CI:-} && -z ${ACT:-}) ]]; then # if running on a remote CI but not on local nektos/act runner
+  MAVEN_CLI_OPTS+=" --no-transfer-progress"
+fi
+if [[ -n ${ACT:-} ]]; then
+  MAVEN_CLI_OPTS+=" -Dformatter.validate.lineending=KEEP"
+fi
+echo "  -> MAVEN_CLI_OPTS: $MAVEN_CLI_OPTS"
 
 
 echo
@@ -101,11 +66,10 @@ echo "###################################################"
 echo "# Determining current Maven project version...    #"
 echo "###################################################"
 # https://stackoverflow.com/questions/3545292/how-to-get-maven-project-version-to-the-bash-command-line
-projectVersion="$(mvn -s .ci/maven-settings.xml help:evaluate -Dexpression=project.version -q -DforceStdout)"
+projectVersion=$(python -c "import xml.etree.ElementTree as ET; \
+  print(ET.parse(open('pom.xml')).getroot().find(  \
+  '{http://maven.apache.org/POM/4.0.0}version').text)")
 echo "  -> Current Version: $projectVersion"
-
-# change <properties><java.version>XYZ</java.version></properties> value
-sed -i -E "s/(<java.version>).*(<\/java.version>)/\1${JAVA_VERSION}\2/" pom.xml
 
 #
 # decide whether to perform a release build or build+deploy a snapshot version
@@ -140,6 +104,7 @@ if [[ ${projectVersion:-foo} == ${POM_CURRENT_VERSION:-bar} && ${MAY_CREATE_RELE
       -DreleaseVersion=${POM_RELEASE_VERSION} \
       -DdevelopmentVersion=${nextDevelopmentVersion} \
       help:active-profiles clean release:clean release:prepare release:perform \
+      | grep -v -e "\[INFO\] Download.* from repository-restored-from-cache" `# suppress download messages from repo restored from cache ` \
       | grep -v -e "\[INFO\]  .* \[0.0[0-9][0-9]s\]" # the grep command suppresses all lines from maven-buildtime-extension that report plugins with execution time <=99ms
 else
    echo
@@ -153,5 +118,6 @@ else
    fi
    mvn $MAVEN_CLI_OPTS "$@" \
       help:active-profiles clean $mavenGoal \
+      | grep -v -e "\[INFO\] Download.* from repository-restored-from-cache" `# suppress download messages from repo restored from cache ` \
       | grep -v -e "\[INFO\]  .* \[0.0[0-9][0-9]s\]" # the grep command suppresses all lines from maven-buildtime-extension that report plugins with execution time <=99ms
 fi

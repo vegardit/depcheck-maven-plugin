@@ -82,7 +82,13 @@ jobs:
 
 
     steps:
-    - name: Show environment variables
+    - name: "Show: GitHub context"
+      env:
+        GITHUB_CONTEXT: ${{ toJSON(github) }}
+      run: echo $GITHUB_CONTEXT
+
+
+    - name: "Show: environment variables"
       run: env | sort
 
 
@@ -90,52 +96,94 @@ jobs:
       uses: actions/checkout@v4  # https://github.com/actions/checkout
 
 
-    - name: "Install: JDK ${{ env.JAVA_VERSION }}"
+    - name: "Install: JDK 11 ☕"  # to compile project
       uses: actions/setup-java@v4  # https://github.com/actions/setup-java
+      id: setup-java-11
+      with:
+        distribution: temurin
+        java-version: 11
+
+
+    - name: "Install: JDK ${{ matrix.java }} ☕"  # to run tests
+      uses: actions/setup-java@v4  # https://github.com/actions/setup-java
+      id: setup-java-tests
       with:
         distribution: temurin
         java-version: ${{ matrix.java }}
-        cache: maven
+
+
+    - name: "Install: JDK 17 ☕"  # to run Maven and plugins
+      uses: actions/setup-java@v4  # https://github.com/actions/setup-java
+      id: setup-java-17
+      with:
+        distribution: temurin
+        java-version: 17
+
+
+    - name: Set JAVA_HOME env vars
+      run: |
+        echo "JAVA11_HOME=${{ steps.setup-java-11.outputs.path }}" >> $GITHUB_ENV
+        echo "JAVA17_HOME=${{ steps.setup-java-17.outputs.path }}" >> $GITHUB_ENV
+        echo "JAVA_FOR_TESTS_HOME=${{ steps.setup-java-tests.outputs.path }}" >> $GITHUB_ENV
+        echo "JAVA_FOR_TESTS_VERSION=${{ matrix.java }}" >> $GITHUB_ENV
 
 
     - name: "Install: Maven"
       uses: stCarolas/setup-maven@v5  # https://github.com/stCarolas/setup-maven
       with:
-        maven-version: 3.9.8
+        maven-version: 3.9.9
 
 
-    # reusing CDS archives of the same JVM randomly fails in GitHub Actions with
-    # "An error has occurred while processing the shared archive file. shared class paths mismatch"
-    #- name: Calculate Java version checksum
-    #  id: java-version-checksum
-    #  run: |
-    #    echo "md5sum=$(java -version 2>&1 | md5sum | cut -f1 -d" ")" >> $GITHUB_OUTPUT
-    #- name: Cache Java CDS archive
-    #  uses: actions/cache@v3
-    #  with:
-    #    path: |
-    #      ~/.xshare/${{ steps.java-version-checksum.outputs.md5sum }}
-    #    key: ${{ runner.os }}-xshare-${{ steps.java-version-checksum.outputs.md5sum }}
+    - name: "Cache: Maven Binary"
+      uses: actions/cache@v4  # https://github.com/actions/cache/blob/main/restore/README.md
+      with:
+        path: |
+          ~/.m2/wrapper
+        key: ${{ runner.os }}-${{ runner.arch }}-mvn-binary-${{ hashFiles('.mvn/wrapper/maven-wrapper.properties') }}
 
 
-    - name: Test with Maven
+    - name: "Cache: Restore"
+      id: cache-restore
+      uses: actions/cache/restore@v4  # https://github.com/actions/cache/blob/main/restore/README.md
+      with:
+        # IMPORTANT: path must have exactly the same value as in the cache save step otherwise restore will fail with cache key not found 
+        path: |
+          ~/.m2/bin
+          ~/.m2/repository
+          !~/.m2/repository/.cache
+          !~/.m2/repository/.meta
+          !~/.m2/repository/com/vegardit/maven
+          !~/.m2/repository/*SNAPSHOT*
+        key: ${{ runner.os }}-${{ runner.arch }}-mvn-repo-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ runner.arch }}-mvn-repo-
+
+
+    - name: "Move Restored Repo"
+      if: ${{ steps.cache-restore.outputs.cache-hit }}
+      run: |
+         RESTORED_REPO_PATH=$HOME/.m2/repository-restored
+         mv -v ~/.m2/repository $RESTORED_REPO_PATH
+         echo "RESTORED_REPO_PATH=$RESTORED_REPO_PATH" >> $GITHUB_ENV
+
+
+    - name: "Test with Maven 🔨"
       if: ${{ !matrix.may_create_release || env.ACT }}
       env:
         GITHUB_USER: ${{ github.actor }}
         GITHUB_API_KEY: ${{ github.token }}
-        JAVA_VERSION: ${{ matrix.java }}
         MAY_CREATE_RELEASE: false
       run: |
-        bash .ci/build.sh ${{ github.event.inputs.additional_maven_args }}
+        bash .ci/build.sh ${{ github.event.inputs.additional_maven_args }} \
+          -Djava.version.unit-tests=${{ matrix.java }}
 
 
-    - name: Build with Maven
+    - name: "Build with Maven 🔨"
       if: ${{ matrix.may_create_release && !env.ACT }}
       env:
         DEPLOY_SNAPSHOTS_TO_GITHUB_BRANCH: true
         GITHUB_USER: ${{ github.actor }}
         GITHUB_API_KEY: ${{ secrets.GH_API_TOKEN }}
-        JAVA_VERSION: ${{ matrix.java }}
         MAY_CREATE_RELEASE: true
         SIGN_KEY: ${{ secrets.GPG_SIGN_KEY }}
         SIGN_KEY_PASS: ${{ secrets.GPG_SIGN_KEY_PWD }}
@@ -147,7 +195,8 @@ jobs:
         # https://github.community/t/github-actions-bot-email-address/17204
         git config user.name "github-actions[bot]"
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        bash .ci/build.sh ${{ github.event.inputs.additional_maven_args }}
+        bash .ci/build.sh ${{ github.event.inputs.additional_maven_args }} \
+          -Djava.version.unit-tests=${{ matrix.java }}
 
         if find . -path "*/target/site/jacoco/jacoco.xml" | grep -q .; then
           echo 'has_jacoco_results=true' >> $GITHUB_OUTPUT
@@ -164,6 +213,32 @@ jobs:
         coverageLocations:  |
           ${{ github.workspace }}/target/site/jacoco/jacoco.xml:jacoco
           ${{ github.workspace }}/target/site/jacoco-it/jacoco.xml:jacoco
+
+
+    ##################################################
+    # Cache Update
+    # See https://github.com/actions/cache/issues/342#issuecomment-1399442670
+    ##################################################
+    - name: "Cache: Delete Previous"
+      if: ${{ steps.cache-restore.outputs.cache-hit && !env.ACT }}
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        gh extension install actions/gh-actions-cache
+        # "|| true" is to avoid "Error: Resource not accessible by integration" from failing the job 
+        gh actions-cache delete ${{ steps.cache-restore.outputs.cache-primary-key }} --confirm || true
+
+    - name: "Cache: Update"
+      uses: actions/cache/save@v4  # https://github.com/actions/cache/blob/main/save/README.md
+      with:
+        path: |
+          ~/.m2/bin
+          ~/.m2/repository
+          !~/.m2/repository/.cache
+          !~/.m2/repository/.meta
+          !~/.m2/repository/com/vegardit/maven
+          !~/.m2/repository/*SNAPSHOT*
+        key: ${{ steps.cache-restore.outputs.cache-primary-key }}
 
 
     ##################################################
