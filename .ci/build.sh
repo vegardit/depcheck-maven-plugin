@@ -71,6 +71,8 @@ projectVersion=$(python -c "import xml.etree.ElementTree as ET; \
   '{http://maven.apache.org/POM/4.0.0}version').text)")
 echo "  -> Current Version: $projectVersion"
 
+chmod u+x ./mvnw
+
 #
 # decide whether to perform a release build or build+deploy a snapshot version
 #
@@ -95,7 +97,7 @@ if [[ ${projectVersion:-foo} == ${POM_CURRENT_VERSION:-bar} && ${MAY_CREATE_RELE
 
    export DEPLOY_RELEASES_TO_MAVEN_CENTRAL=true
 
-   mvn $MAVEN_CLI_OPTS "$@" \
+   ./mvnw $MAVEN_CLI_OPTS "$@" \
       -DskipTests=${SKIP_TESTS} \
       -DskipITs=${SKIP_TESTS} \
       -DdryRun=${DRY_RUN} \
@@ -116,7 +118,7 @@ else
    else
       mavenGoal="verify"
    fi
-   mvn $MAVEN_CLI_OPTS "$@" \
+   ./mvnw $MAVEN_CLI_OPTS "$@" \
       help:active-profiles clean $mavenGoal \
       | grep -v -e "\[INFO\] Download.* from repository-restored-from-cache" `# suppress download messages from repo restored from cache ` \
       | grep -v -e "\[INFO\]  .* \[0.0[0-9][0-9]s\]" # the grep command suppresses all lines from maven-buildtime-extension that report plugins with execution time <=99ms
