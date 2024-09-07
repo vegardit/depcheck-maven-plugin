@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   SPDX-FileCopyrightText: © Vegard IT GmbH (https://vegardit.com)
+   SPDX-FileContributor: Sebastian Thomschke
+   SPDX-License-Identifier: Apache-2.0
+   SPDX-ArtifactOfProjectHomePage: https://github.com/vegardit/depcheck-maven-plugin
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+   <modelVersion>4.0.0</modelVersion>
+
+   <parent>
+      <groupId>com.vegardit.maven</groupId>
+      <artifactId>vegardit-maven-parent</artifactId>
+      <version>5.1.0</version>
+   </parent>
+
+   <artifactId>depcheck-maven-plugin</artifactId>
+   <version>2.0.2-SNAPSHOT</version>
+   <packaging>maven-plugin</packaging>
+
+
+   <name>${project.artifactId}</name>
+   <description>Pragmatic Maven plugin to check for unused direct and used indirect (transitive) dependencies.</description>
+   <url>https://github.com/vegardit/depcheck-maven-plugin</url>
+   <inceptionYear>2013</inceptionYear>
+   <organization>
+      <!-- used as Specification/Implementation-Vendor in MANIFEST.MF -->
+      <name>Vegard IT GmbH, Germany</name>
+      <url>https://vegardit.com/</url>
+   </organization>
+   <licenses>
+      <license>
+         <name>Apache License 2.0</name>
+         <distribution>repo</distribution>
+         <url>https://spdx.org/licenses/Apache-2.0</url>
+      </license>
+   </licenses>
+
+
+   <properties>
+      <java.version>11</java.version>
+      <skip.japicmp.cmp>true</skip.japicmp.cmp>
+      <maven.minimum.version>3.6.3</maven.minimum.version>
+   </properties>
+
+
+   <scm>
+      <!-- https://maven.apache.org/scm/git.html -->
+      <url>https://github.com/vegardit/depcheck-maven-plugin</url>
+      <connection>scm:git:https://github.com/vegardit/depcheck-maven-plugin.git</connection>
+      <developerConnection>scm:git:https://github.com/vegardit/depcheck-maven-plugin.git</developerConnection>
+      <tag>HEAD</tag>
+   </scm>
+
+
+   <issueManagement>
+      <system>github.com</system>
+      <url>https://github.com/vegardit/depcheck-maven-plugin/issues</url>
+   </issueManagement>
+
+
+   <ciManagement>
+      <system>github.com</system>
+      <url>https://github.com/vegardit/depcheck-maven-plugin/actions</url>
+   </ciManagement>
+
+
+   <dependencyManagement>
+      <dependencies>
+         <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-artifact</artifactId>
+            <version>${maven.minimum.version}</version>
+            <scope>provided</scope>
+         </dependency>
+         <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-core</artifactId>
+            <version>${maven.minimum.version}</version>
+            <scope>provided</scope>
+         </dependency>
+         <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+            <version>${maven.minimum.version}</version>
+            <scope>provided</scope>
+         </dependency>
+         <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-settings</artifactId>
+            <version>${maven.minimum.version}</version>
+            <scope>provided</scope>
+         </dependency>
+
+         <dependency>
+            <groupId>net.sf.jstuff</groupId>
+            <artifactId>jstuff-xml</artifactId>
+            <version>7.14.0</version>
+            <type>pom</type>
+            <scope>import</scope>
+         </dependency>
+         <dependency>
+            <groupId>org.junit</groupId>
+            <artifactId>junit-bom</artifactId>
+            <version>5.11.0</version>
+            <type>pom</type>
+            <scope>import</scope>
+         </dependency>
+      </dependencies>
+   </dependencyManagement>
+
+
+   <dependencies>
+      <dependency>
+         <groupId>net.sf.jstuff</groupId>
+         <artifactId>jstuff-xml</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>org.ow2.asm</groupId>
+         <artifactId>asm</artifactId>
+         <version>9.7</version>
+      </dependency>
+
+      <dependency>
+         <!-- http://maven.apache.org/plugin-tools/maven-plugin-plugin/examples/using-annotations.html -->
+         <groupId>org.apache.maven.plugin-tools</groupId>
+         <artifactId>maven-plugin-annotations</artifactId>
+         <!-- https://search.maven.org/artifact/org.apache.maven.plugin-tools/maven-plugin-annotations -->
+         <version>3.15.0</version>
+         <!-- annotations are not needed for plugin execution so you can remove this dependency for execution with using provided scope -->
+         <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>org.apache.maven</groupId>
+         <artifactId>maven-core</artifactId>
+      </dependency>
+
+      <!-- test dependencies -->
+      <dependency>
+         <groupId>io.takari.maven.plugins</groupId>
+         <artifactId>takari-plugin-testing</artifactId>
+         <version>3.0.4</version>
+         <scope>test</scope>
+         <!-- TODO https://github.com/takari/takari-plugin-testing-project/pull/90
+         <exclusions>
+            <exclusion>
+               <groupId>junit</groupId>
+               <artifactId>junit</artifactId>
+            </exclusion>
+         </exclusions>
+         -->
+      </dependency>
+      <dependency>
+         <!-- https://stackoverflow.com/a/16707144/5116073 -->
+         <groupId>org.apache.maven</groupId>
+         <artifactId>maven-compat</artifactId>
+         <version>${maven.minimum.version}</version>
+         <scope>test</scope>
+      </dependency>
+
+      <!-- required for remote artifact resolution -->
+      <dependency>
+         <groupId>org.apache.maven.wagon</groupId>
+         <artifactId>wagon-http</artifactId>
+         <!-- 3.3.4 is compatible with Maven 3.6.3 -->
+         <version>3.3.4</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.maven.resolver</groupId>
+         <artifactId>maven-resolver-connector-basic</artifactId>
+         <!-- 1.4.1 is compatible with Maven 3.6.3 -->
+         <version>1.4.1</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.maven.resolver</groupId>
+         <artifactId>maven-resolver-transport-wagon</artifactId>
+         <!-- 1.4.1 is compatible with Maven 3.6.3 -->
+         <version>1.4.1</version>
+         <scope>test</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>org.junit.jupiter</groupId>
+         <artifactId>junit-jupiter</artifactId>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.assertj</groupId>
+         <artifactId>assertj-core</artifactId>
+         <version>3.26.3</version>
+         <scope>test</scope>
+      </dependency>
+   </dependencies>
+
+
+   <build>
+      <plugins>
+         <plugin>
+            <groupId>io.takari.maven.plugins</groupId>
+            <artifactId>takari-lifecycle-plugin</artifactId>
+            <version>2.1.7</version>
+            <extensions>true</extensions>
+            <executions>
+               <execution>
+                  <id>testProperties</id>
+                  <phase>process-test-resources</phase>
+                  <goals>
+                     <goal>testProperties</goal>
+                  </goals>
+               </execution>
+            </executions>
+         </plugin>
+         <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <dependencies>
+               <dependency>
+                  <!-- TODO can be removed after https://github.com/takari/takari-plugin-testing-project/pull/90 -->
+                  <groupId>org.apache.maven.surefire</groupId>
+                  <artifactId>surefire-junit-platform</artifactId>
+                  <version>${maven.surefire.version}</version>
+               </dependency>
+            </dependencies>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-plugin-plugin</artifactId>
+            <version>3.15.0</version>
+            <configuration>
+               <goalPrefix>depcheck</goalPrefix>
+               <helpPackageName>com.vegardit.maven.plugin.depcheck</helpPackageName>
+            </configuration>
+            <executions>
+               <execution>
+                  <id>generate-helpmojo@generate-sources</id>
+                  <phase>generate-sources</phase>
+                  <goals>
+                     <goal>helpmojo</goal>
+                  </goals>
+               </execution>
+            </executions>
+         </plugin>
+      </plugins>
+   </build>
+</project>
