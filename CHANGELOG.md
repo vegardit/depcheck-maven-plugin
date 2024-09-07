@@ -8,18 +8,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.2] - 2024-09-07
+
 ### Changed
-- Upgraded dependencies:
+- Upgraded runtime dependencies:
   - asm from 9.5 -> 9.7
-  - jstuff-xml 7.6.0 -> 7.14.0
   - maven-plugin-annotations 3.9.0 -> 3.15.0
   - maven-plugin-plugin 3.9.0 -> 3.15.0
+  - jstuff-xml 5.14.3 -> 7.6.0
 
 
 ## [2.0.1] - 2023-06-23
 
 ### Changed
-- various dependency upgrades
+- Upgraded runtime dependencies:
+  - asm from 9.1 -> 9.5
+  - maven-plugin-annotations 3.6.0 -> 3.9.0
+  - maven-plugin-plugin 3.6.0 -> 3.9.0
+  - jstuff-xml 7.6.0 -> 7.14.0
 
 
 ## [2.0.0] - 2022-06-21
