@@ -37,7 +37,7 @@ echo "###################################################"
 echo "# Determining GIT branch......                    #"
 echo "###################################################"
 GIT_BRANCH=$(git branch --show-current)
-echo "  -> GIT Branch: $GIT_BRANCH"; echo
+echo "  -> GIT Branch: $GIT_BRANCH"
 
 
 echo

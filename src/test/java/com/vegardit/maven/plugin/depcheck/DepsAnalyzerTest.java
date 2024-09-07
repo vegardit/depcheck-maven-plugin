@@ -6,7 +6,7 @@ package com.vegardit.maven.plugin.depcheck;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.vegardit.maven.util.AbstractMavenTest;
 import com.vegardit.maven.util.DummyArtifact;
@@ -14,10 +14,10 @@ import com.vegardit.maven.util.DummyArtifact;
 /**
  * @author Sebastian Thomschke, Vegard IT GmbH
  */
-public class DepsAnalyzerTest extends AbstractMavenTest {
+class DepsAnalyzerTest extends AbstractMavenTest {
 
    @Test
-   public void testIsAnonymousInnerClass() throws Exception {
+   void testIsAnonymousInnerClass() throws Exception {
       final var da = new DepsAnalyzer(getMojo(getSession("empty-project-with-check-deps"), CheckDepsMojo.MAVEN_GOAL));
 
       assertThat(da.isAnonymousInnerClass(null)).isFalse();
@@ -29,7 +29,7 @@ public class DepsAnalyzerTest extends AbstractMavenTest {
    }
 
    @Test
-   public void testIsArtifactWithClasses() throws Exception {
+   void testIsArtifactWithClasses() throws Exception {
       final var da = new DepsAnalyzer(getMojo(getSession("empty-project-with-check-deps"), CheckDepsMojo.MAVEN_GOAL));
 
       assertThat(da.isArtifactWithClasses(new DummyArtifact().withType("ejb"))).isTrue();

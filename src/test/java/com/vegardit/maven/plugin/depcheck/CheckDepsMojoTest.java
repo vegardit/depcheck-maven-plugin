@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.*;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.repository.RepositorySystem;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.vegardit.maven.util.AbstractMavenTest;
 
@@ -18,10 +18,10 @@ import net.sf.jstuff.core.collection.Sets;
 /**
  * @author Sebastian Thomschke, Vegard IT GmbH
  */
-public class CheckDepsMojoTest extends AbstractMavenTest {
+class CheckDepsMojoTest extends AbstractMavenTest {
 
    @Test
-   public void testConfig() throws Exception {
+   void testConfig() throws Exception {
       final CheckDepsMojo mojo = getMojo(getSession("empty-project-with-check-deps"), CheckDepsMojo.MAVEN_GOAL);
 
       assertThat(mojo.checkForUnusedDependencies).isTrue();
@@ -34,7 +34,7 @@ public class CheckDepsMojoTest extends AbstractMavenTest {
    }
 
    @Test
-   public void testFindUnusedDep() throws Exception {
+   void testFindUnusedDep() throws Exception {
       final CheckDepsMojo mojo = getMojo(getSession("project-with-unused-dep"), CheckDepsMojo.MAVEN_GOAL);
 
       assertThat(mojo.checkForUnusedDependencies).isTrue();
@@ -56,12 +56,12 @@ public class CheckDepsMojoTest extends AbstractMavenTest {
    }
 
    @Test
-   public void testUsedTransDeps() throws Exception {
+   void testUsedTransDeps() throws Exception {
 
       final MavenSession sess = getSession("project-with-used-transitive-dep");
 
       // workaround for mavenProject.getArtifacts() returning null when run as test case
-      final RepositorySystem repositorySystem = mojoRule.lookup(RepositorySystem.class);
+      final RepositorySystem repositorySystem = maven.lookup(RepositorySystem.class);
       sess.getCurrentProject().setArtifacts(Sets.newHashSet(repositorySystem.createArtifact("org.apache.commons", "commons-lang3", "3.12.0",
          "jar")));
 

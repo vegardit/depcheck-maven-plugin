@@ -13,7 +13,7 @@
    <parent>
       <groupId>com.vegardit.maven</groupId>
       <artifactId>vegardit-maven-parent</artifactId>
-      <version>5.0.0</version>
+      <version>5.1.0</version>
    </parent>
 
    <artifactId>depcheck-maven-plugin</artifactId>
@@ -47,7 +47,7 @@
 
 
    <scm>
-      <!-- http://maven.apache.org/scm/git.html -->
+      <!-- https://maven.apache.org/scm/git.html -->
       <url>https://github.com/vegardit/depcheck-maven-plugin</url>
       <connection>scm:git:https://github.com/vegardit/depcheck-maven-plugin.git</connection>
       <developerConnection>scm:git:https://github.com/vegardit/depcheck-maven-plugin.git</developerConnection>
@@ -101,6 +101,13 @@
             <type>pom</type>
             <scope>import</scope>
          </dependency>
+         <dependency>
+            <groupId>org.junit</groupId>
+            <artifactId>junit-bom</artifactId>
+            <version>5.11.0</version>
+            <type>pom</type>
+            <scope>import</scope>
+         </dependency>
       </dependencies>
    </dependencyManagement>
 
@@ -134,21 +141,18 @@
 
       <!-- test dependencies -->
       <dependency>
-         <groupId>org.apache.maven.plugin-testing</groupId>
-         <artifactId>maven-plugin-testing-harness</artifactId>
-         <version>3.3.0</version>
+         <groupId>io.takari.maven.plugins</groupId>
+         <artifactId>takari-plugin-testing</artifactId>
+         <version>3.0.4</version>
          <scope>test</scope>
+         <!-- TODO https://github.com/takari/takari-plugin-testing-project/pull/90
          <exclusions>
             <exclusion>
-               <!-- To prevent:
-                [WARNING] There are 2 dependencies with no license :
-                [WARNING]  - classworlds-classworlds-1.1-alpha-2
-                [WARNING]  - org.codehaus.plexus-plexus-container-default-1.0-alpha-9-stable-1
-               -->
-               <groupId>org.codehaus.plexus</groupId>
-               <artifactId>plexus-archiver</artifactId>
+               <groupId>junit</groupId>
+               <artifactId>junit</artifactId>
             </exclusion>
          </exclusions>
+         -->
       </dependency>
       <dependency>
          <!-- https://stackoverflow.com/a/16707144/5116073 -->
@@ -182,14 +186,8 @@
       </dependency>
 
       <dependency>
-         <groupId>org.slf4j</groupId>
-         <artifactId>slf4j-simple</artifactId>
-         <scope>test</scope>
-      </dependency>
-      <dependency>
-         <groupId>junit</groupId>
-         <artifactId>junit</artifactId>
-         <version>4.13.2</version>
+         <groupId>org.junit.jupiter</groupId>
+         <artifactId>junit-jupiter</artifactId>
          <scope>test</scope>
       </dependency>
       <dependency>
@@ -203,6 +201,32 @@
 
    <build>
       <plugins>
+         <plugin>
+            <groupId>io.takari.maven.plugins</groupId>
+            <artifactId>takari-lifecycle-plugin</artifactId>
+            <version>2.1.7</version>
+            <extensions>true</extensions>
+            <executions>
+               <execution>
+                  <id>testProperties</id>
+                  <phase>process-test-resources</phase>
+                  <goals>
+                     <goal>testProperties</goal>
+                  </goals>
+               </execution>
+            </executions>
+         </plugin>
+         <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <dependencies>
+               <dependency>
+                  <!-- TODO can be removed after https://github.com/takari/takari-plugin-testing-project/pull/90 -->
+                  <groupId>org.apache.maven.surefire</groupId>
+                  <artifactId>surefire-junit-platform</artifactId>
+                  <version>${maven.surefire.version}</version>
+               </dependency>
+            </dependencies>
+         </plugin>
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-plugin-plugin</artifactId>
