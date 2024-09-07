@@ -5,8 +5,7 @@
    SPDX-License-Identifier: Apache-2.0
    SPDX-ArtifactOfProjectHomePage: https://github.com/vegardit/depcheck-maven-plugin
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
    <modelVersion>4.0.0</modelVersion>
 
@@ -17,7 +16,7 @@
    </parent>
 
    <artifactId>depcheck-maven-plugin</artifactId>
-   <version>2.0.2-SNAPSHOT</version>
+   <version>2.0.2</version>
    <packaging>maven-plugin</packaging>
 
 
@@ -51,7 +50,7 @@
       <url>https://github.com/vegardit/depcheck-maven-plugin</url>
       <connection>scm:git:https://github.com/vegardit/depcheck-maven-plugin.git</connection>
       <developerConnection>scm:git:https://github.com/vegardit/depcheck-maven-plugin.git</developerConnection>
-      <tag>HEAD</tag>
+      <tag>2.0.2</tag>
    </scm>
 
 
