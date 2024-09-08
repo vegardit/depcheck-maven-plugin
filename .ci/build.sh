@@ -71,7 +71,11 @@ projectVersion=$(python -c "import xml.etree.ElementTree as ET; \
   '{http://maven.apache.org/POM/4.0.0}version').text)")
 echo "  -> Current Version: $projectVersion"
 
+#
+# ensure mnvw is executable
+#
 chmod u+x ./mvnw
+
 
 #
 # decide whether to perform a release build or build+deploy a snapshot version
