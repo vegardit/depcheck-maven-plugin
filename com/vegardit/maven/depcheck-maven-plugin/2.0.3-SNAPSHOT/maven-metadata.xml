@@ -3,27 +3,27 @@
   <groupId>com.vegardit.maven</groupId>
   <artifactId>depcheck-maven-plugin</artifactId>
   <versioning>
-    <lastUpdated>20241108201358</lastUpdated>
+    <lastUpdated>20250309210048</lastUpdated>
     <snapshot>
-      <timestamp>20241108.201358</timestamp>
+      <timestamp>20250309.210048</timestamp>
       <buildNumber>1</buildNumber>
     </snapshot>
     <snapshotVersions>
       <snapshotVersion>
         <extension>pom</extension>
-        <value>2.0.3-20241108.201358-1</value>
-        <updated>20241108201358</updated>
+        <value>2.0.3-20250309.210048-1</value>
+        <updated>20250309210048</updated>
       </snapshotVersion>
       <snapshotVersion>
         <extension>jar</extension>
-        <value>2.0.3-20241108.201358-1</value>
-        <updated>20241108201358</updated>
+        <value>2.0.3-20250309.210048-1</value>
+        <updated>20250309210048</updated>
       </snapshotVersion>
       <snapshotVersion>
         <classifier>sources</classifier>
         <extension>jar</extension>
-        <value>2.0.3-20241108.201358-1</value>
-        <updated>20241108201358</updated>
+        <value>2.0.3-20250309.210048-1</value>
+        <updated>20250309210048</updated>
       </snapshotVersion>
     </snapshotVersions>
   </versioning>
