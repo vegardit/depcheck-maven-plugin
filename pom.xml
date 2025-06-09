@@ -142,7 +142,7 @@
       <dependency>
          <groupId>io.takari.maven.plugins</groupId>
          <artifactId>takari-plugin-testing</artifactId>
-         <version>3.1.0</version>
+         <version>3.1.1</version>
          <scope>test</scope>
          <!-- TODO https://github.com/takari/takari-plugin-testing-project/pull/90
          <exclusions>
