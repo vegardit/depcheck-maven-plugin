@@ -1,10 +1,10 @@
 # depcheck-maven-plugin
 
-[![Build Status](https://github.com/vegardit/depcheck-maven-plugin/workflows/Build/badge.svg "GitHub Actions")](https://github.com/vegardit/depcheck-maven-plugin/actions?query=workflow%3A%22Build%22)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/vegardit/depcheck-maven-plugin/build.yml?logo=github)](https://github.com/vegardit/depcheck-maven-plugin/actions/workflows/build.yml)
+[![codecov](https://codecov.io/gh/vegardit/depcheck-maven-plugin/graph/badge.svg?token=YCVWZQSFHI)](https://codecov.io/gh/vegardit/depcheck-maven-plugin)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.1%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 [![License](https://img.shields.io/github/license/vegardit/depcheck-maven-plugin.svg?color=blue)](LICENSE.txt)
 [![Changelog](https://img.shields.io/badge/History-changelog-blue)](CHANGELOG.md)
-[![Maintainability](https://api.codeclimate.com/v1/badges/38f32c6acda045ed2337/maintainability)](https://codeclimate.com/github/vegardit/depcheck-maven-plugin/maintainability)
-[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 [![Maven Central](https://img.shields.io/maven-central/v/com.vegardit.maven/depcheck-maven-plugin)](https://search.maven.org/artifact/com.vegardit.maven/depcheck-maven-plugin)
 
 1. [What is it?](#what-is-it)
