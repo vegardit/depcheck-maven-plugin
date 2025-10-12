@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"com.vegardit.maven.plugin.depcheck"},{"l":"com.vegardit.maven.util"}]
