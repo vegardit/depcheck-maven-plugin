@@ -216,7 +216,7 @@ SPDX-ArtifactOfProjectHomePage: https://github.com/vegardit/depcheck-maven-plugi
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-plugin-plugin</artifactId>
-            <version>3.15.1</version>
+            <version>3.15.2</version>
             <configuration>
                <goalPrefix>depcheck</goalPrefix>
                <helpPackageName>com.vegardit.maven.plugin.depcheck</helpPackageName>
