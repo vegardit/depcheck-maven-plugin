@@ -5,7 +5,7 @@
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.1%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 [![License](https://img.shields.io/github/license/vegardit/depcheck-maven-plugin.svg?color=blue)](LICENSE.txt)
 [![Changelog](https://img.shields.io/badge/History-changelog-blue)](CHANGELOG.md)
-[![Maven Central](https://img.shields.io/maven-central/v/com.vegardit.maven/depcheck-maven-plugin)](https://search.maven.org/artifact/com.vegardit.maven/depcheck-maven-plugin)
+[![Maven Central](https://img.shields.io/maven-central/v/com.vegardit.maven/vegardit-maven-parent)](https://central.sonatype.com/artifact/com.vegardit.maven/depcheck-maven-plugin)
 
 1. [What is it?](#what-is-it)
 1. [Usage](#usage)
@@ -108,7 +108,7 @@ Since the plugin performs a byte code analysis it must be executed in a Maven ph
 
 ### Binaries
 
-**Release** binaries of this project are available at Maven Central https://search.maven.org/artifact/com.vegardit.maven/depcheck-maven-plugin
+**Release** binaries of this project are available at Maven Central https://central.sonatype.com/artifact/com.vegardit.maven/depcheck-maven-plugin
 
 **Snapshot** binaries are available via the [mvn-snapshots-repo](https://github.com/vegardit/depcheck-maven-plugin/tree/mvn-snapshots-repo) git branch. You need to add this repository configuration to your Maven `settings.xml`:
 
